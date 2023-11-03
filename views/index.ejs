@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      html {
+        width: 100svw;
+        height: 100svh;
+      }
+
+      /* .wrap {
+        width: 100vw;
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      } */
+
+      .wrapcard {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <% include ./navbar.ejs %>
+    <div class="wrap">
+      <div class="wrapcard">
+        <% for(var i=0; i< coffee.length; i++) { %>
+        <input
+          type="hidden"
+          name="menuNumber"
+          value="<%=coffee[i].menuNumber %>"
+        />
+
+        <a href="/menuDetail/<%= coffee[i].menuNumber %>">
+          <% include ./card.ejs %>
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

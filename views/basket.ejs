@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<head>
+
+<style>
+/*  css */
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        .wrap {
+            padding-top: 100px;
+            justify-content: center;
+            align-items: center;
+        }
+        .title {
+            padding-bottom: 20px;
+        }
+        th {
+            padding-right: 1rem;
+        }
+        .container{
+            width: 80%;
+            box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
+
+            text-align: center;
+
+        }
+        .thead{
+            height: 52px;
+            border-bottom: 1px solid #000000;
+            font-size: 16px;
+            vertical-align: middle;
+        }
+
+/* --- */
+</style>
+
+</head>
+
+<body>
+    <% include ./navbar.ejs %>
+
+<div class="wrap">
+<div class="container">
+<table>
+<thead>
+<tr>
+    <!-- <th scope="col" calss = "thead"></th> -->
+    <th scope="col" class = "thead">
+        메뉴이름
+    </th>
+    <th scope="col" class = "thead">개수</th>
+    <th scope = "col" class = "thead">가격</th>
+</tr>
+</thead>
+<tbody>
+
+    <% if(basket != undefined) { %>
+        <% for(var i =0 ; i< basket.length ; i++) { %>
+        <tr>
+        <!-- <th><input type = "checkbox" name = "check"  /> </th> -->
+        <th><%= basket[i].menuName %></th>
+        <th><%= basket[i].count %></th>
+        <th><%= Number(basket[i].count)*Number(basket[i].menuPrice) %></th>
+        </tr>
+
+        <% } %>
+
+        <% } %>
+ 
+        <tr>
+            <th>합계 : <%= totalMoney  %></th>
+            <form action="/order" method="post">
+
+            <input type = "hidden" name = "totalMoney" value = "<%= totalMoney %> " />
+            <th><button type = "submit" >주문하기</button></th>
+            </form>
+        </tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+
+
+</body>
+</html>

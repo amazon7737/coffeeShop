@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+    <style>
+
+* {
+            padding: 0;
+            margin: 0;
+        }
+        .wrap {
+            padding-top: 100px;
+            justify-content: center;
+            align-items: center;
+        }
+        .title {
+            padding-bottom: 20px;
+        }
+        th {
+            padding-right: 1rem;
+        }
+        .container{
+            width: 80%;
+            box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
+
+            text-align: center;
+
+        }
+        .thead{
+            height: 52px;
+            border-bottom: 1px solid #000000;
+            font-size: 16px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <% include ./navbar.ejs %>
+    <div class="wrap">
+        <div class="container">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col" class="thead"> 재료명 </th>
+                        <th scope="col" class="thead"> 재고량 </th>
+                        <th scope="col" class="thead"> 업체명 </th>
+                        <th scope="col" class="thead"> 가격? </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(var i =0; i< supply.length; i++ ) { %>
+                    <tr>
+                        <th><%= supply[i].ingredientName %></th>
+                        <th><%= supply[i].ingredientCount %></th>
+                        <th><%= supply[i].SupplyName %></th>
+                        <th>얼마얼마</th>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

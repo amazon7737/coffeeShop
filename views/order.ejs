@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+<style>
+    *{
+        text-align: center;
+    }
+    div{
+        padding-top: 100px;
+    }
+
+</style>
+
+</head>
+<body>
+
+    <div>
+<form action = "/ordering" method="post">
+
+<select  name = "orderType">
+    <option value="신용카드" selected>신용카드</option>
+    <option value="현금" selected>현금</option>
+    <option value="수표" selected>수표</option>
+</select>
+<input type = "text" name = "orderDate" value = "<%= orderDate %>"/>
+<input type = "text" name = "customerId" placeholder="회원 아이디를 입력해주세요"/>
+<input type = "hidden" name = "basket" value = "<%= basket %>"/>
+
+<h4>주문 총액 : <%= totalMoney %></h4>
+<button type = "submit">주문하기</button>
+</form>
+    </div>
+
+
+
+</body>
+
+</html>
