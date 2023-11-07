@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+<style>
+    /* css */
+
+    * {
+
+        padding:0;
+
+        margin:0;
+
+    }
+
+    .wrap{
+        width: 100svw;
+        min-height: 50svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container{
+        width: 100svw;
+        height: 25svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    p{
+        padding-bottom: 10px;
+    }
+
+
+</style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+
+        <div class = "container">
+            <form action = "/orderSearch/Result" method="post">
+
+            <input type = "text" name = "customerId" placeholder="회원 아이디를 입력해주세요"/>
+            <button type = "submit">조회하기</button>
+
+            </form>
+        </div>
+</div>
+
+
+
+</body>
+
+</html>

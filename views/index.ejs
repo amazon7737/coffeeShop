@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-
     <style>
       * {
         padding: 0;
@@ -10,7 +8,10 @@
       }
       html {
         width: 100svw;
-        height: 100svh;
+        min-height: 100svh;
+      }
+      div {
+        padding-bottom: 10px;
       }
 
       /* .wrap {
@@ -29,12 +30,34 @@
         flex-wrap: wrap;
         background-color: #f8f9fa;
       }
+
+      .container {
+        width: 100svw;
+        height: 25svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .orderManage {
+        padding-bottom: 10px;
+        border-radius: 1px;
+      }
     </style>
   </head>
   <body>
     <% include ./navbar.ejs %>
     <div class="wrap">
-      <div class="wrapcard">
+      <div class="container">
+        <div class="orderManage"><a href="/orderSearch">주문관리</a></div>
+
+        <div class="ingredientManage"><a href="/supplyList">재고관리</a></div>
+
+        <div class="manageLink"><a href="/manage">관리자페이지</a></div>
+      </div>
+
+      <!-- <div class="wrapcard">
         <% for(var i=0; i< coffee.length; i++) { %>
         <input
           type="hidden"
@@ -45,8 +68,9 @@
         <a href="/menuDetail/<%= coffee[i].menuNumber %>">
           <% include ./card.ejs %>
         </a>
+
         <% } %>
-      </div>
+      </div> -->
     </div>
   </body>
 </html>

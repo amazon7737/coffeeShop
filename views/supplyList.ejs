@@ -2,39 +2,37 @@
 <head>
     <style>
 
-* {
+        * {
             padding: 0;
             margin: 0;
         }
+
         .wrap {
-            padding-top: 100px;
+            width: 1920px;
+            height: 1080px;
             justify-content: center;
             align-items: center;
+        }
+
+        .container{
+
+            width: 100svw;
+            height: 25svh;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
         .title {
             padding-bottom: 20px;
         }
         th {
-            padding-right: 1rem;
-        }
-        .container{
-            width: 80%;
-            box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
-
-            text-align: center;
-
-        }
-        .thead{
-            height: 52px;
-            border-bottom: 1px solid #000000;
-            font-size: 16px;
-            vertical-align: middle;
+            padding-right: 10px;
         }
     </style>
 </head>
 
 <body>
-    <% include ./navbar.ejs %>
     <div class="wrap">
         <div class="container">
             <table>
@@ -52,7 +50,7 @@
                         <th><%= supply[i].ingredientName %></th>
                         <th><%= supply[i].ingredientCount %></th>
                         <th><%= supply[i].SupplyName %></th>
-                        <th>얼마얼마</th>
+                        <th><%= supply[i].ingredientPrice %></th>
                     </tr>
                     <% } %>
                 </tbody>

@@ -2,10 +2,30 @@
 <head>
 <style>
     *{
-        text-align: center;
+        padding:0;
+
+        margin:0;
     }
-    div{
-        padding-top: 100px;
+
+    .wrap{
+        width: 100svw;
+        min-height: 100svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container{
+        width: 100svw;
+        min-height: 25svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    table{
+        padding-bottom: 10px;
     }
 
 </style>
@@ -13,22 +33,56 @@
 </head>
 <body>
 
-    <div>
-<form action = "/ordering" method="post">
+<div class="wrap">
 
-<select  name = "orderType">
-    <option value="신용카드" selected>신용카드</option>
-    <option value="현금" selected>현금</option>
-    <option value="수표" selected>수표</option>
-</select>
-<input type = "text" name = "orderDate" value = "<%= orderDate %>"/>
-<input type = "text" name = "customerId" placeholder="회원 아이디를 입력해주세요"/>
-<input type = "hidden" name = "basket" value = "<%= basket %>"/>
+    <div class="container">
+        <table>
+<thead>
 
-<h4>주문 총액 : <%= totalMoney %></h4>
-<button type = "submit">주문하기</button>
-</form>
+        <tr>
+            <th scope="col" class = "thead">메뉴이름</th>
+            <th scope="col" class = "thead">가격</th>
+        </tr>
+
+</thead>
+<tbody>
+
+        <% for(var i =0; i< basket.length; i++ ){ %>
+            <tr>
+                <th>
+                    <%= basket[i].menuName %>
+                </th>
+                <th>
+                    <%= basket[i].menuPrice %>
+                </th>
+            </tr>
+            <% } %>
+
+</tbody>
+        </table>
+        <form action = "/ordering" method="post">
+
+        <select  name = "orderType">
+            <option value="신용카드" selected>신용카드</option>
+            <option value="현금" >현금</option>
+            <option value="수표" >수표</option>
+        </select>
+
+        <input type = "text" name = "orderDate" value = "<%= orderDate %>"/>
+        <input type = "text" name = "customerId" placeholder="회원 아이디를 입력해주세요"/>
+        <input type = "hidden" name = "basket" value = "<%= basket %>"/>
+
+
+
+    
+        <h4>주문 총액 : <%= totalMoney %></h4>
+        <button type = "submit">주문하기</button>
+
+        </form>
     </div>
+
+
+</div>
 
 
 

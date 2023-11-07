@@ -6,22 +6,40 @@
     * {
 
         padding:0;
+
         margin:0;
 
     }
 
-
     .wrap{
-        width: 100vw;
-        height: 500px;
+
+        width: 100svw;
+        min-height: 50svh;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
+
+    }
+
+    .container{
+        width: 100svw;
+        height: 25svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+
+    }
+
+    p{
+
+        padding-bottom: 10px;
+
     }
 
 
-    .box{
+    /* .box{
         display: flex;
         justify-content: space-between;
         margin-top: 20%;
@@ -32,9 +50,9 @@
         box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
         text-align: center;
 
-    }
+    } */
 
-    p{
+    /* p{
         padding-bottom: 10px;
     }
 
@@ -45,13 +63,10 @@
     .button2{
         margin-top:20px;
     }
+
     .image{
         padding-left: 10%;
-    }
-    .book-content{
-        padding: 10% 10%;
-        padding-right: 20%;
-    }
+    } */
 
     /* -------- */
 
@@ -63,14 +78,11 @@
 
 <body>
     <% include ./navbar.ejs %>
+
 <div class="wrap">
-    <div class="box">
 
-        <div class ='image'>
 
-        </div>
-
-        <div class = "book-content">
+        <div class = "container">
 
         <!-- <p><%= coffee[0].menuNumber %>번 </p> -->
         <p>메뉴명 : <%= coffee[0].menuName %></p>
@@ -78,9 +90,8 @@
         <p>가격 :₩ <%= coffee[0].menuPrice %></p>
 
 
-        </div>
 
-        <div class="State">
+        <div class="action">
             <form action = "/addItem/<%= menuNumber %>" method="post">
             <input type = "number" name = "count" value = "1"/>
             <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
@@ -92,6 +103,7 @@
 
         </div>
     </div>
+</div>
 
 </div>
 

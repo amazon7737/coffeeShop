@@ -9,51 +9,51 @@
         margin: 0;
     }
     .wrap {
-        padding-top: 100px;
+        width: 100svw;
+        min-height: 50svh;
         justify-content: center;
         align-items: center;
     }
-    .title {
-        padding-bottom: 20px;
-    }
-    th {
-        padding-right: 1rem;
-    }
     .container{
-        width: 80%;
-        box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
-
-        text-align: center;
+        width: 100svw;
+        height: 25svh;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
 
     }
-    .thead{
-        height: 52px;
-        border-bottom: 1px solid #000000;
-        font-size: 16px;
-        vertical-align: middle;
+    th{
+        padding-right:10px;
     }
+
 </style>
 <!-- -- -->
 </head>
 <body>
-    <% include ./navbar.ejs %>
    <div class="wrap">
     <div class="container">
         <table>
             <thead>
                 <tr>
+                    <th scope="col" class="thead">주문번호</th>
                     <th scope="col" class="thead">메뉴이름</th>
                     <th scope="col" class="thead">가격</th>
                     <th scope="col" class="thead">지불방식</th>
                     <th scope="col" class="thead">지불날짜</th>
                     <th scope="col" class="thead">고객아이디</th>
-                    <th scope="col" class="thead">주문번호</th>
+                    <th scope="col" class="thead">고객이름</th>
                 </tr>
             </thead>
 
             <tbody>
                 <% for(var i =0; i< data.length; i++ ){ %>
                 <tr>
+                    <th>
+                        <% if(i==0 || data[i-1].orderId != data[i].orderId) { %>
+                        <%= data[i].orderId %>
+                        <% }%>
+                    </th>
                     <th>
                         <%= data[i].menuName %>
                     </th>
@@ -69,8 +69,9 @@
                     <th>
                         <%= data[i].customer_customerId %>
                     </th>
+                   
                     <th>
-                        <%= data[i].orderId %>
+                        <%= data[i].customer_customerName %>
                     </th>
                 </tr>
                 <% } %>

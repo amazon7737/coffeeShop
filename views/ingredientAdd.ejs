@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+<style>
+    /* css */
+
+    * {
+
+        padding:0;
+        margin:0;
+
+    }
+
+    .wrap{
+        width: 100svw;
+        min-height: 50svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container{
+        width: 100svw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    p{
+        padding-bottom: 10px;
+    }
+
+
+</style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+
+        <div class = "container">
+
+        <form action = "/ingredientAdd" method="post">
+            <% for(var i = 0; i < company.length; i++ ) { %>
+        <select name="company" >
+                <!-- <option value = " <%= company[i].SupplyName %> "></option> -->
+                <option value = "<%= company[i].SupplyName %>"><%= company[i].SupplyName %></option>
+        </select>
+            <% } %>
+            <input type="text" name="ingredientName" placeholder="재료 이름 입력"/>
+            <input type = "number" name = "count" placeholder="수량 입력" />
+            <input type="text" name="ingredientPrice"  placeholder="재료 가격 입력"/>
+
+            <button type = "submit">제출</button>
+
+            </form>
+
+        </div>
+</div>
+
+</div>
+
+
+</body>
+
+</html>
