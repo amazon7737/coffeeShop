@@ -10,17 +10,17 @@
     }
     .wrap {
         width: 100svw;
-        min-height: 50svh;
+        min-height: 100svh;
         justify-content: center;
         align-items: center;
     }
     .container{
         width: 100svw;
-        height: 25svh;
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        padding-top: 20px;
 
     }
     th{
@@ -31,6 +31,7 @@
 <!-- -- -->
 </head>
 <body>
+
    <div class="wrap">
     <div class="container">
         <table>
@@ -52,7 +53,7 @@
                     <th>
                         <% if(i==0 || data[i-1].orderId != data[i].orderId) { %>
                         <%= data[i].orderId %>
-                        <% }%>
+                        <% } %>
                     </th>
                     <th>
                         <%= data[i].menuName %>

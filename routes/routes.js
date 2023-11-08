@@ -47,6 +47,34 @@ router.get("/", async (req, res, next) => {
   });
 });
 
+// 커피 물품 검색 기능
+router.post("/coffee/search", async (req, res, next) => {
+  let { key } = req.body;
+  console.log("!!!", typeof key);
+  // res.send("성공");
+
+  if (key == "coffee") {
+    key = "커피";
+  }
+  try {
+    const coffeeSearch = await pool.query(
+      "select * from coffee.menu where menuCategory like ?",
+      ["%" + key + "%"]
+    );
+    console.log("!!!", coffeeSearch[0]);
+    if (coffeeSearch[0] == []) {
+      return res.send(
+        `<script type = "text/javascript">alert("해당 카테고리가 없습니다."); location.href= "/";</script>`
+      );
+    }
+    return res.render("menuList", { coffee: coffeeSearch[0] });
+  } catch (error) {
+    return res.send(
+      `<script type = "text/javascript">alert("해당 카테고리가 없습니다."); location.href= "/";</script>`
+    );
+  }
+});
+
 router.get("/manage", async (req, res, next) => {
   res.render("manage");
 });
@@ -135,7 +163,7 @@ router.post("/addItem/:menuNumber", async (req, res, next) => {
   /**
    * --
    */
-
+  console.log("basket:", req.session.basket);
   res.send(
     `<script type = "text/javascript" >alert("장바구니에 추가되었습니다"); location.href="/manage";</script>`
   );
@@ -212,6 +240,12 @@ router.post("/ordering", async (req, res, next) => {
       ]
     );
   }
+
+  // 주문 후 장바구니 우기
+  req.session.basket = undefined;
+  console.log("!@#@!@!#@!", req.session.basket);
+
+  // 주문 완료 신호
   res.send(
     `<script type = "text/javascript">alert("주문이 완료되었습니다."); location.href="/"</script>`
   );

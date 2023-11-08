@@ -66,6 +66,12 @@
         padding-left: 31px;
       }
 
+      .search{
+        padding-top: 10px;
+        padding-right: 20px;
+
+      }
+
 /* --------------------------  */
 
     </style>
@@ -85,6 +91,26 @@
             <a class="navbar-brand" href="/">디비벅스</a>
           </div>
 
+          <form class="form-inline my-2 my-lg-0" action = "/coffee/search" method="post">
+            <div class="search">
+              <div class="searchBar">
+
+              <input
+                  id = "searchBar"
+                  class="form-control mr-sm-2"
+                  type="text"
+                  name = "key"
+                  placeholder="검색할 내용을 입력해주세요."
+                />
+              </div>
+                <div class="searchButton">
+
+                <button id = "searchButton" class="btn btn-sm btn-outline-secondary" type="submit">
+                  검색
+                </button>
+                </div>
+            </div>
+          </form>
 
                   </div>
               </form>
