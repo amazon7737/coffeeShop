@@ -51,9 +51,7 @@
                 <% for(var i =0; i< data.length; i++ ){ %>
                 <tr>
                     <th>
-                        <% if(i==0 || data[i-1].orderId != data[i].orderId) { %>
                         <%= data[i].orderId %>
-                        <% } %>
                     </th>
                     <th>
                         <%= data[i].menuName %>

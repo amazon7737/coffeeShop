@@ -37,6 +37,16 @@
         padding-bottom: 10px;
 
     }
+    .ingredient{
+        padding-top: 20px;
+    }
+    .ingredient-container{
+        display: flex;
+        flex-direction: column;
+    }
+    th{
+        padding-right: 10px;
+    }
 
 
     /* .box{
@@ -91,7 +101,6 @@
 
 
 
-        <div class="action">
             <form action = "/addItem/<%= menuNumber %>" method="post">
             <input type = "number" name = "count" value = "1"/>
             <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
@@ -101,7 +110,37 @@
             <button type = "submit" >담기</button>
             </form>
 
-        </div>
+            <form action = "/purchase" method="post">
+                <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
+                <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
+                <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
+                <button type = "submit">구매하기</button>
+            </form>
+
+
+                <p class = "ingredient">영양성분</p>
+                <table>
+
+                <thead>
+
+                    <tr>
+                        <th>재료이름</th>
+                        <th>재료양</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                <div class="ingredient-container">
+                <% for(var i = 0; i< ingredient.length; i++) { %>
+                    <tr>
+
+                    <th><%= ingredient[i].ingredientName %></th>
+                    <th><%= ingredient[i].ingredientSize %></th>
+                    </tr>
+                    <% } %>
+                </div>
+                </tbody>
+                </table>
     </div>
 </div>
 

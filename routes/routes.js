@@ -12,7 +12,10 @@ const pool = require("../db/db");
 // 해야할것
 /**
  *
- * 메뉴에 사용되는 재료 항목 추가
+ * 관리자 판별
+ *
+ * 메뉴 - 재료 추가기능
+ *
  */
 
 /**
@@ -58,8 +61,9 @@ router.post("/coffee/search", async (req, res, next) => {
   }
   try {
     const coffeeSearch = await pool.query(
-      "select * from coffee.menu where menuCategory like ?",
-      ["%" + key + "%"]
+      // "select * from coffee.menu where menuCategory like ?",
+      "select * from coffee.menu where menuName like ?  or menuCategory like ?",
+      ["%" + key + "%", "%" + key + "%"]
     );
     console.log("!!!", coffeeSearch[0]);
     if (coffeeSearch[0] == []) {
@@ -111,15 +115,16 @@ router.get("/menuDetail/:menuNumber", async (req, res) => {
     // 선택한 커피의 영양성분까지 조회 (menu_has_ingredient)
     // 영양성분 참조할 데이터가 없으면 해당 메뉴 데이터까지 조회가 안되는 버그가 있음
     const coffeeIngredient = await pool.query(
-      "SELECT b.*, c.* FROM coffee.menu_has_ingredient a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber where a.menu_menuNumber = ?",
+      "SELECT b.*, c.*, a.ingredientSize FROM coffee.menu_has_ingredient a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber where a.menu_menuNumber = ?",
       [menuNumber]
     );
 
-    // console.log("???", coffeeIngredient[0]);
+    console.log("???", coffeeIngredient[0]);
 
     return res.render("coffeeDetail", {
       coffee: coffee[0],
       menuNumber: menuNumber,
+      ingredient: coffeeIngredient[0],
     });
   } catch (error) {
     console.log(error);
@@ -241,7 +246,7 @@ router.post("/ordering", async (req, res, next) => {
     );
   }
 
-  // 주문 후 장바구니 우기
+  // 주문 후 장바구니 비우기
   req.session.basket = undefined;
   console.log("!@#@!@!#@!", req.session.basket);
 
@@ -250,6 +255,38 @@ router.post("/ordering", async (req, res, next) => {
     `<script type = "text/javascript">alert("주문이 완료되었습니다."); location.href="/"</script>`
   );
 });
+
+// 바로구매 페이지
+router.post("/purchase", async (req, res) => {
+  const { count, menuName, menuNumber, menuPrice } = req.body;
+  console.log("purchase:", menuName, menuNumber, menuPrice, count);
+
+  // 날짜 생성
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth();
+  let date = today.getDate();
+  const wdate = year + "-" + month + "-" + date;
+
+  basket = [
+    {
+      menuName: menuName,
+      menuPrice: menuPrice,
+      menuNumber: menuNumber,
+    },
+  ];
+  req.session.basket = basket;
+
+  let totalMoney = Number(menuPrice);
+
+  res.render("order", {
+    orderDate: wdate,
+    basket: basket,
+    totalMoney: totalMoney,
+  });
+});
+
+// 바로구매 기능
 
 // 주문 내역 조회
 router.get("/orderList", async (req, res, next) => {
@@ -291,14 +328,43 @@ router.post("/orderSearch/Result", async (req, res, next) => {
   }
 });
 
-// 재료 업체별 재고량 조회
-router.get("/supplyList", async (req, res, next) => {
+// 재료 업체별 재고량 페이지
+router.get("/supplySearch", async (req, res, next) => {
   const supplyList = await pool.query(
     "SELECT a.*, b.*, c.* FROM coffee.Supply_has_ingredient a inner join coffee.Supply b on a.Supply_SupplyNumber = b.SupplyNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber;"
   );
   console.log(supplyList[0]);
 
-  res.render("supplyList", { supply: supplyList[0] });
+  res.render("supplySearch");
+});
+
+// 재료 업체별 재고량 조회 기능
+// 관리자 판별 코드에서 할지 디비에서 할지 고민하기
+router.post("/supplySearch", async (req, res) => {
+  const { customerId } = req.body;
+  try {
+    const customerCheck = await pool.query(
+      "select * from coffee.customer where customerId = ? ",
+      [customerId]
+    );
+    if (customerCheck.length != 0) {
+      const supplyList = await pool.query(
+        "SELECT a.*, b.*, c.* FROM coffee.Supply_has_ingredient a inner join coffee.Supply b on a.Supply_SupplyNumber = b.SupplyNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber;"
+      );
+      return res.render("supplyList", { supply: supplyList[0] });
+    } else {
+      return res.send(
+        `<script type = "text/javascript" >alert('해당 관리자가 존재하지 않습니다'); location.href = "/supplySearch"; </script>`
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    return res.send(
+      `<script type = "text/javascript" >alert('해당 관리자가 존재하지 않습니다'); location.href = "/supplySearch"; </script>`
+    );
+  }
+
+  console.log(supplyList[0]);
 });
 
 // 커피 메뉴 추가 페이지

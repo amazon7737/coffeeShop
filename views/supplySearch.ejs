@@ -1,0 +1,64 @@
+
+
+
+<!DOCTYPE html>
+<head>
+<style>
+    /* css */
+
+    * {
+
+        padding:0;
+        margin:0;
+
+    }
+
+    .wrap{
+        width: 100svw;
+        height: 50svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .container{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding-top: 10px;
+    }
+
+    p{
+        padding-bottom: 10px;
+    }
+
+
+</style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+            <h1>재고량 조회</h1>
+        <div class = "container">
+            <form action = "/supplySearch" method="post">
+
+            <input type = "text" placeholder="관리자 아이디 입력"/>
+            <button type = "submit">조회</button>
+            </form>
+
+        </div>
+</div>
+
+</div>
+
+
+</body>
+
+</html>
+
+
+
