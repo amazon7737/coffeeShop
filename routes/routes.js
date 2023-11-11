@@ -42,11 +42,11 @@ router.get("/", async (req, res, next) => {
   console.log("basket:", basket);
 
   // 커피 메뉴 전체 조회
-  const coffee = await pool.query("select * from coffee.menu;");
+  // const coffee = await pool.query("select * from coffee.menu;");
   // console.log("!!!", coffee[0]);
+
   res.render("index", {
-    title: "Express",
-    coffee: coffee[0],
+    // coffee: coffee[0],
   });
 });
 
@@ -214,86 +214,103 @@ router.post("/order", async (req, res, next) => {
 // 주문하기 기능
 router.post("/ordering", async (req, res, next) => {
   const { orderType, orderDate, customerId } = req.body;
-  const basket = req.session.basket;
-  console.log("basket:", basket);
-  // order 테이블에 주문번호 자동생성 (orderType, orderDate, customerId, orderId)
-  const users = await pool.query(
-    "select * from coffee.customer where customerId = ?",
-    [Number(customerId)]
-  );
-  console.log("users:", users[0][0]);
+  try {
+    let basket = req.session.basket;
+    console.log("basket:", basket);
+    // order 테이블에 주문번호 자동생성 (orderType, orderDate, customerId, orderId)
 
-  const orderAdd = await pool.query(
-    "insert into coffee.order values(?,?,null, ?,?) ",
-    [orderType, orderDate, Number(customerId), users[0][0].customerName]
-  );
+    const users = await pool.query(
+      "select * from coffee.customer where customerId = ?",
+      [Number(customerId)]
+    );
+    console.log("users:", users[0][0]);
+    if (users[0][0] == undefined) {
+      return res.send(
+        `<script type = "text/javascript">alert("주문 중 문제가 발생했습니다. 주문서를 다시 확인해주세요."); window.history.back();</script>`
+      );
+    }
+    const orderAdd = await pool.query(
+      "insert into coffee.order values(?,?,null, ?,?) ",
+      [orderType, orderDate, Number(customerId), users[0][0].customerName]
+    );
 
-  // order-menu (menuNumber, orderId, menuCount)
-  const orderSel = await pool.query(
-    "select * from coffee.order where orderType = ? and orderDate =? and customer_customerId = ?",
-    [orderType, orderDate, Number(customerId)]
-  );
-  console.log("orderSel:", orderSel[0]);
+    // order-menu (menuNumber, orderId, menuCount)
+    // 주문 번호를 기준으로 select하지 않아서 중복되는 정보이라면 엉뚱한 주문번호를 select 하게된다 -> 해결: 주문번호를 기준으로 최근주문번호부터 맨처음에 뜨게 하게
+    const orderSel = await pool.query(
+      "select * from coffee.order where orderType = ? and orderDate =? and customer_customerId = ? order by orderId desc;",
+      [orderType, orderDate, Number(customerId)]
+    );
+    console.log("orderSel:", orderSel[0]);
+    console.log("orderId:", orderSel[0][0]);
 
-  for (var i = 0; i < basket.length; i++) {
-    const orderMenuAdd = await pool.query(
-      "insert into coffee.order_menu values(null, ?,?,?);",
-      [
-        Number(basket[i].menuNumber),
-        Number(orderSel[0][0].orderId),
-        basket[i].count,
-      ]
+    for (var i = 0; i < basket.length; i++) {
+      const orderMenuAdd = await pool.query(
+        "insert into coffee.order_menu values(null, ?,?,?);",
+        [
+          Number(basket[i].menuNumber),
+          Number(orderSel[0][0].orderId),
+          basket[i].count,
+        ]
+      );
+    }
+
+    // 주문 후 장바구니 비우기
+    req.session.basket = undefined;
+    console.log("!@#@!@!#@!", req.session.basket);
+    // 주문 완료 신호
+    return res.send(
+      `<script type = "text/javascript">alert("주문이 완료되었습니다."); location.href="/"</script>`
+    );
+  } catch (error) {
+    console.log(error);
+    return res.send(
+      `<script type = "text/javascript">alert("주문 중 문제가 발생했습니다. 주문서를 다시 확인해주세요."; window.history.back();</script>`
     );
   }
-
-  // 주문 후 장바구니 비우기
-  req.session.basket = undefined;
-  console.log("!@#@!@!#@!", req.session.basket);
-
-  // 주문 완료 신호
-  res.send(
-    `<script type = "text/javascript">alert("주문이 완료되었습니다."); location.href="/"</script>`
-  );
 });
 
 // 바로구매 페이지
 router.post("/purchase", async (req, res) => {
   const { count, menuName, menuNumber, menuPrice } = req.body;
   console.log("purchase:", menuName, menuNumber, menuPrice, count);
+  try {
+    let basket = [
+      {
+        menuNumber: menuNumber,
+        menuName: menuName,
+        count: count,
+        menuPrice: menuPrice,
+      },
+    ];
 
-  // 날짜 생성
-  let today = new Date();
-  let year = today.getFullYear();
-  let month = today.getMonth();
-  let date = today.getDate();
-  const wdate = year + "-" + month + "-" + date;
+    req.session.basket = basket;
+    // 날짜 생성
+    let today = new Date();
+    let year = today.getFullYear();
+    let month = today.getMonth();
+    let date = today.getDate();
+    const totalMoney = Number(basket[0].count) * Number(basket[0].menuPrice);
 
-  basket = [
-    {
-      menuName: menuName,
-      menuPrice: menuPrice,
-      menuNumber: menuNumber,
-    },
-  ];
-  req.session.basket = basket;
+    // console.log("???", basket[0].count, basket[0].menuPrice);
 
-  let totalMoney = Number(menuPrice);
+    const wdate = year + "-" + month + "-" + date;
 
-  res.render("order", {
-    orderDate: wdate,
-    basket: basket,
-    totalMoney: totalMoney,
-  });
+    return res.render("order", {
+      basket: basket,
+      orderDate: wdate,
+      totalMoney: totalMoney,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
-
-// 바로구매 기능
 
 // 주문 내역 조회
 router.get("/orderList", async (req, res, next) => {
   const orderList = await pool.query(
     "SELECT b.*, c.* FROM coffee.order_menu a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.order c on a.order_orderId = c.orderId;"
   );
-  console.log(orderList[0]);
+  console.log("orderList", orderList[0]);
   res.render("orderList", { data: orderList[0] });
 });
 
@@ -309,11 +326,12 @@ router.post("/orderSearch/Result", async (req, res, next) => {
   // console.log("customerId:", customerId);
   try {
     const orderList = await pool.query(
-      "SELECT b.*, c.* FROM coffee.order_menu a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.order c on a.order_orderId = c.orderId where customer_customerId = ? order by orderId ;",
+      "SELECT a.menuCount, b.*, c.* FROM coffee.order_menu a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.order c on a.order_orderId = c.orderId where customer_customerId = ? order by orderId ;",
       [Number(customerId)]
     );
 
     // console.log("orderList:", orderList[0][0].orderId);
+    console.log("orderList:", orderList[0]);
 
     if (orderList[0][0].orderId === undefined) {
       return res.send(

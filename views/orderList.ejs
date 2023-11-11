@@ -40,6 +40,7 @@
                     <th scope="col" class="thead">주문번호</th>
                     <th scope="col" class="thead">메뉴이름</th>
                     <th scope="col" class="thead">가격</th>
+                    <th scope="col" class="thead">개수</th>
                     <th scope="col" class="thead">지불방식</th>
                     <th scope="col" class="thead">지불날짜</th>
                     <th scope="col" class="thead">고객아이디</th>
@@ -60,6 +61,9 @@
                         <%= data[i].menuPrice %>
                     </th>
                     <th>
+                        <%= data[i].menuCount %>
+                    </th>
+                    <th>
                         <%= data[i].orderType %>
                     </th>
                     <th>
@@ -76,6 +80,7 @@
                 <% } %>
             </tbody>
         </table>
+
     </div>
    </div> 
 </body>

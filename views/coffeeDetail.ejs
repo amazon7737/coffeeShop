@@ -47,6 +47,9 @@
     th{
         padding-right: 10px;
     }
+    form{
+        padding-bottom: 10px;
+    }
 
 
     /* .box{
@@ -102,20 +105,26 @@
 
 
             <form action = "/addItem/<%= menuNumber %>" method="post">
-            <input type = "number" name = "count" value = "1"/>
-            <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
-            <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
-            <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
 
-            <button type = "submit" >담기</button>
-            </form>
-
-            <form action = "/purchase" method="post">
+                <input type = "number" name = "count" value = "1"/>
                 <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
                 <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
                 <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
-                <button type = "submit">구매하기</button>
+                <input type="hidden" name = "directOrder" value = "0" />
+
+                <button type = "submit" >담기</button>
             </form>
+
+
+            <form action = "/purchase" method="post">
+                <input type = "number" name = "count" value = "1"/>
+                <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
+                <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
+                <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
+
+
+                <button type = "submit">바로구매하기</button>
+                </form>
 
 
                 <p class = "ingredient">영양성분</p>
