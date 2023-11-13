@@ -47,7 +47,9 @@
 </thead>
 <tbody>
 
+        <% for(var j =0; j< check.length; j++ ){ %>
         <% for(var i =0; i< basket.length; i++ ){ %>
+            <% if(check[j] == basket[i].menuNumber ) { %>
             <tr>
                 <th>
                     <%= basket[i].menuName %>
@@ -56,6 +58,9 @@
                     <%= basket[i].menuPrice %>
                 </th>
             </tr>
+        <% } %>
+            <% } %>
+
             <% } %>
 
 </tbody>
@@ -71,8 +76,9 @@
         <input type = "text" name = "orderDate" value = "<%= orderDate %>"/>
         <input type = "text" name = "customerId" placeholder="회원 아이디를 입력해주세요"/>
         <input type = "hidden" name = "basket" value = "<%= basket %>"/>
+        <input type = "hidden" name = "check" value = "<%= check %>"/>
     
-        <h4>주문 총액 : <%= totalMoney %></h4>
+        <h4>주문 총액 : <%= resultMoney %></h4>
         <button type = "submit">주문하기</button>
 
         </form>

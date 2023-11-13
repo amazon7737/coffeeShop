@@ -43,8 +43,19 @@
 
         <div class = "container">
 
-            <p>어떤 메뉴에</p>
-            <p>어떤 재료가</p>
+            <select name="supply">
+                <% for(var i =0; i < supply.length; i++) { %>
+
+                <option value= "콜롬비아만세" selected><%= supply[i].SupplyName %></option>
+
+                <% } %>
+            </select>
+            
+
+            <input type = "text" name = "ingredientName" placeholder="재료를 입력해주세요"/>
+            <input type = "text" name = "count" placeholder="수량을 입력해주세요"/>
+
+            <button type = "submit" >주문하기</button>
 
         </div>
 </div>

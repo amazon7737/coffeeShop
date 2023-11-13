@@ -170,32 +170,40 @@ router.post("/addItem/:menuNumber", async (req, res, next) => {
    */
   console.log("basket:", req.session.basket);
   res.send(
-    `<script type = "text/javascript" >alert("장바구니에 추가되었습니다"); location.href="/manage";</script>`
+    `<script type = "text/javascript" >alert("장바구니에 추가되었습니다"); location.href = "/orderList";</script>`
   );
 });
 
-// 장바구니 이지
+// 장바구니 페이지
 router.get("/basket", async (req, res, next) => {
   const basket = req.session.basket;
   console.log("장바구니 내역:", basket);
-  let totalMoney = 0;
+  // let totalMoney = 0;
   try {
-    for (var i = 0; i < basket.length; i++) {
-      totalMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
+    // for (var i = 0; i < basket.length; i++) {
+    //   totalMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
+    // }
+    if (basket == undefined) {
+      return res.send(
+        `<script type = "text/javascript">alert("장바구니에 물품이 없습니다."); window.history.back();</script>`
+      );
     }
-    return res.render("basket", { basket: basket, totalMoney: totalMoney });
+    return res.render("basket", { basket: basket });
   } catch (error) {
     return res.send(
-      `<script type = "text/javascript">alert("장바구니에 물품이 없습니다."); location.href="/manage";</script>`
+      `<script type = "text/javascript">alert("장바구니에 물품이 없습니다."); window.history.back();</script>`
     );
   }
 });
 
 // 주문서 페이지
 router.post("/order", async (req, res, next) => {
-  const { totalMoney } = req.body;
+  const { check } = req.body;
   const basket = req.session.basket;
-  // console.log(totalMoney, basket);
+
+  console.log("basket:", basket);
+
+  console.log("check:", check);
 
   // 날짜 생성
   let today = new Date();
@@ -204,21 +212,48 @@ router.post("/order", async (req, res, next) => {
   let date = today.getDate();
   const wdate = year + "-" + month + "-" + date;
 
+  // 총액 새로 계산
+  let resultMoney = 0;
+
+  if (check == undefined) {
+    return res.send(
+      `<script type = "text/javascript" >alert("주문할 상품을 선택해주세요."); window.history.back();</script>`
+    );
+  }
+
+  try {
+    // 총액 계산 중
+    for (var j = 0; j < check.length; j++) {
+      for (var i = 0; i < basket.length; i++) {
+        if (check[j] == basket[i].menuNumber) {
+          resultMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
+        }
+      }
+    }
+    console.log("resultMoney", resultMoney);
+  } catch (error) {
+    console.log(error);
+    return res.send(
+      `<script type = "text/javascript" >alert("주문할 상품을 선택해주세요."); window.history.back();</script>`
+    );
+  }
+
   res.render("order", {
     orderDate: wdate,
-    totalMoney: totalMoney,
+    resultMoney: resultMoney,
     basket: basket,
+    check: check,
   });
 });
 
 // 주문하기 기능
 router.post("/ordering", async (req, res, next) => {
-  const { orderType, orderDate, customerId } = req.body;
+  const { orderType, orderDate, customerId, check } = req.body;
   try {
     let basket = req.session.basket;
     console.log("basket:", basket);
-    // order 테이블에 주문번호 자동생성 (orderType, orderDate, customerId, orderId)
 
+    // order 테이블에 주문번호 자동생성 (orderType, orderDate, customerId, orderId)
     const users = await pool.query(
       "select * from coffee.customer where customerId = ?",
       [Number(customerId)]
@@ -229,6 +264,8 @@ router.post("/ordering", async (req, res, next) => {
         `<script type = "text/javascript">alert("주문 중 문제가 발생했습니다. 주문서를 다시 확인해주세요."); window.history.back();</script>`
       );
     }
+
+    // 주문하는 사람의 주문번호 생성
     const orderAdd = await pool.query(
       "insert into coffee.order values(?,?,null, ?,?) ",
       [orderType, orderDate, Number(customerId), users[0][0].customerName]
@@ -236,6 +273,7 @@ router.post("/ordering", async (req, res, next) => {
 
     // order-menu (menuNumber, orderId, menuCount)
     // 주문 번호를 기준으로 select하지 않아서 중복되는 정보이라면 엉뚱한 주문번호를 select 하게된다 -> 해결: 주문번호를 기준으로 최근주문번호부터 맨처음에 뜨게 하게
+    // 주문하는 사람의 주문번호 확인
     const orderSel = await pool.query(
       "select * from coffee.order where orderType = ? and orderDate =? and customer_customerId = ? order by orderId desc;",
       [orderType, orderDate, Number(customerId)]
@@ -243,15 +281,23 @@ router.post("/ordering", async (req, res, next) => {
     console.log("orderSel:", orderSel[0]);
     console.log("orderId:", orderSel[0][0]);
 
-    for (var i = 0; i < basket.length; i++) {
-      const orderMenuAdd = await pool.query(
-        "insert into coffee.order_menu values(null, ?,?,?);",
-        [
-          Number(basket[i].menuNumber),
-          Number(orderSel[0][0].orderId),
-          basket[i].count,
-        ]
-      );
+    // 선택한 메뉴들만 주문
+    for (var j = 0; j < check.length; j++) {
+      for (var i = 0; i < basket.length; i++) {
+        console.log("basket!:", basket);
+        console.log("check!:", check);
+        if (check[j] == basket[i].menuNumber) {
+          // 주문한 메뉴 주문하기
+          const orderMenuAdd = await pool.query(
+            "insert into coffee.order_menu values(null, ?,?,?);",
+            [
+              Number(basket[i].menuNumber),
+              Number(orderSel[0][0].orderId),
+              basket[i].count,
+            ]
+          );
+        }
+      }
     }
 
     // 주문 후 장바구니 비우기
@@ -360,12 +406,15 @@ router.get("/supplySearch", async (req, res, next) => {
 // 관리자 판별 코드에서 할지 디비에서 할지 고민하기
 router.post("/supplySearch", async (req, res) => {
   const { customerId } = req.body;
+  console.log("customerId1:", customerId);
   try {
     const customerCheck = await pool.query(
       "select * from coffee.customer where customerId = ? ",
       [customerId]
     );
-    if (customerCheck.length != 0) {
+    console.log("!@", customerCheck[0]);
+    // if (customerCheck[0].length != 0) {
+    if (customerCheck[0][0].customerId == 1987) {
       const supplyList = await pool.query(
         "SELECT a.*, b.*, c.* FROM coffee.Supply_has_ingredient a inner join coffee.Supply b on a.Supply_SupplyNumber = b.SupplyNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber;"
       );
@@ -450,7 +499,9 @@ router.post("/ingredientAdd", async (req, res, next) => {
 
 // 메뉴-재료 추가 페이지
 router.get("/menuMake", async (req, res, next) => {
-  res.render("menuMake");
+  const supply = await pool.query("select * from coffee.Supply;");
+  console.log("supply:", supply[0]);
+  res.render("menuMake", { supply: supply[0] });
 });
 
 // 메뉴-재료 추가 기능

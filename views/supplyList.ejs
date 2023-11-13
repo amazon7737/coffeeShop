@@ -41,7 +41,8 @@
                         <th scope="col" class="thead"> 재료명 </th>
                         <th scope="col" class="thead"> 재고량 </th>
                         <th scope="col" class="thead"> 업체명 </th>
-                        <th scope="col" class="thead"> 가격? </th>
+                        <th scope="col" class="thead"> 재료가격 </th>
+                        <th scope="col" class="thead"> 배달일 </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,6 +52,7 @@
                         <th><%= supply[i].ingredientCount %></th>
                         <th><%= supply[i].SupplyName %></th>
                         <th><%= supply[i].ingredientPrice %></th>
+                        <th><%= supply[i].deliveryDate %></th>
                     </tr>
                     <% } %>
                 </tbody>
