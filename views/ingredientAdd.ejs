@@ -42,12 +42,11 @@
         <div class = "container">
 
         <form action = "/ingredientAdd" method="post">
-            <% for(var i = 0; i < company.length; i++ ) { %>
         <select name="company" >
-                <!-- <option value = " <%= company[i].SupplyName %> "></option> -->
+            <% for(var i = 0; i < company.length; i++ ) { %>
                 <option value = "<%= company[i].SupplyName %>"><%= company[i].SupplyName %></option>
-        </select>
             <% } %>
+        </select>
             <input type="text" name="ingredientName" placeholder="재료 이름 입력"/>
             <input type = "number" name = "count" placeholder="수량 입력" />
             <input type="text" name="ingredientPrice"  placeholder="재료 가격 입력"/>

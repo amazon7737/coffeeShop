@@ -12,7 +12,7 @@ const pool = require("../db/db");
 // 해야할것
 /**
  *
- * 관리자 판별
+ * 관리자 -> 회원아이디 admin으로 변경후 admin만 인식해서 관리자로 변경
  *
  * 메뉴 - 재료 추가기능
  *
@@ -460,14 +460,14 @@ router.post("/manage/menuAdd", async (req, res, next) => {
   }
 });
 
-// 재료 추가 페이지
+// 업체별 재료 추가 페이지
 router.get("/ingredientAdd", async (req, res, next) => {
-  const supply = await pool.query("select * from coffee.Supply");
+  const supply = await pool.query("select * from coffee.Supply;");
   console.log("supply:", supply[0]);
   res.render("ingredientAdd", { company: supply[0] });
 });
 
-// 재료 추가 기능
+// 업체별 재료 추가 기능
 router.post("/ingredientAdd", async (req, res, next) => {
   const { company, ingredientName, count, ingredientPrice } = req.body;
   console.log(company, ingredientName, ingredientPrice, count);
@@ -483,27 +483,140 @@ router.post("/ingredientAdd", async (req, res, next) => {
   );
   console.log("menu:", menu[0]);
 
-  const ingredient_supply = await pool.query(
-    "insert into coffee.Supply_has_ingredient values(?,?,?,?)",
-    [
-      Number(supply[0][0].SupplyNumber),
-      Number(menu[0][0].ingredientNumber),
-      count,
-      ingredientPrice,
-    ]
-  );
-  res.send(
-    `<script type = "text/javascript" >alert("재료를 추가하였습니다"); location.href="/";</script>`
-  );
+  try {
+    const ingredient_supply = await pool.query(
+      "insert into coffee.Supply_has_ingredient values(?,?,?,?)",
+      [
+        Number(supply[0][0].SupplyNumber),
+        Number(menu[0][0].ingredientNumber),
+        count,
+        ingredientPrice,
+      ]
+    );
+    res.send(
+      `<script type = "text/javascript" >alert("재료를 추가하였습니다"); location.href="/";</script>`
+    );
+  } catch (error) {
+    console.log(error);
+    res.send(
+      `<script type = "text/javascript">alert("해당 재료가 없습니다."); window.history.back();</script>`
+    );
+  }
 });
 
-// 메뉴-재료 추가 페이지
-router.get("/menuMake", async (req, res, next) => {
-  const supply = await pool.query("select * from coffee.Supply;");
-  console.log("supply:", supply[0]);
-  res.render("menuMake", { supply: supply[0] });
+// (레시피 추가를 위한 메뉴 목록 페이지)
+router.get("/recipe", async (req, res, next) => {
+  const coffee = await pool.query("select * from coffee.menu;");
+
+  res.render("recipeList", { coffee: coffee[0] });
 });
 
-// 메뉴-재료 추가 기능
+// (아이템 디테일)
+router.get("/recipeDetail/:menuNumber", async (req, res, next) => {
+  const { menuNumber } = req.params;
+
+  try {
+    const coffee = await pool.query(
+      "select * from coffee.menu where menuNumber = ?",
+      [menuNumber]
+    );
+
+    const coffeeIngredient = await pool.query(
+      "SELECT b.*, c.*, a.ingredientSize FROM coffee.menu_has_ingredient a inner join coffee.menu b on a.menu_menuNumber = b.menuNumber inner join coffee.ingredient c on a.ingredient_ingredientNumber = c.ingredientNumber where a.menu_menuNumber = ?",
+      [menuNumber]
+    );
+
+    console.log("coffeeIngredient:", coffeeIngredient[0]);
+
+    return res.render("recipeDetail", {
+      coffee: coffee[0],
+      menuNumber: menuNumber,
+      ingredient: coffeeIngredient[0],
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// 레시피 추가 페이지
+router.post("/recipe/addPage", async (req, res, next) => {
+  const { menuNumber } = req.body;
+  const menu = await pool.query(
+    "select menuName from coffee.menu where menuNumber = ?",
+    [menuNumber]
+  );
+  res.render("recipeAdd", {
+    menuNumber: menuNumber,
+    menuName: menu[0][0].menuName,
+  });
+});
+
+//레시피 추가 기능
+router.post("/recipe/add", async (req, res, next) => {
+  const { menuNumber, ingredientName, ingredientSize } = req.body;
+  try {
+    const ingredient = await pool.query(
+      "select ingredientNumber from coffee.ingredient where ingredientName = ?",
+      [ingredientName]
+    );
+
+    console.log(ingredient[0]);
+    const recipeAdd = await pool.query(
+      "insert into coffee.menu_has_ingredient values(?,?,?)",
+      [
+        Number(menuNumber),
+        Number(ingredient[0][0].ingredientNumber),
+        ingredientSize,
+      ]
+    );
+    res.send(
+      `<script type = "text/javascript">alert("재료가 추가되었습니다."); location.href = "/recipe";</script>`
+    );
+  } catch (error) {
+    console.log(error);
+    res.send(
+      `<script type = "text/javascript">alert("재료를 다시 확인해주세요."); window.history.back();</script>`
+    );
+  }
+});
+
+// 레시피 수정 기능
+router.post("/recipe/update", async (req, res, next) => {
+  const { menuNumber, ingredientNumber, name, size } = req.body;
+  console.log(menuNumber, ingredientNumber, name, size);
+  try {
+    for (var i = 0; i < menuNumber.length; i++) {
+      const recipeUpdate = await pool.query(
+        "update coffee.menu_has_ingredient set ingredientSize = ? where menu_menuNumber = ? and ingredient_ingredientNumber = ? ",
+        [size[i], Number(menuNumber[i]), Number(ingredientNumber[i])]
+      );
+    }
+    res.send(
+      `<script type = "text/javascript">alert("레시피가 업데이트 되었습니다."); location.href = "/recipe";</script>`
+    );
+  } catch (error) {
+    console.log(error);
+    res.send(
+      `<script type = "text/javascript">alert("업데이트 오류가 발생하였습니다."); location.href = "/recipe";</script>`
+    );
+  }
+});
+
+//레시피 삭제 기능
+router.post("/recipe/del/:target", async (req, res, next) => {
+  const { ingredientNumber, menuNumber } = req.body;
+  console.log(ingredientNumber, menuNumber);
+  try {
+    const delIngredient = await pool.query(
+      "delete from menu_has_ingredient where ingredient_ingredientNumber = ? and menu_menuNumber = ?",
+      [Number(ingredientNumber), Number(menuNumber)]
+    );
+    return res.send(
+      `<script type = "text/javascript">alert("재료를 삭제하였습니다"); window.history.back(); location.reload();</script>`
+    );
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 module.exports = router;

@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <head>
 <style>
@@ -42,21 +40,15 @@
 
 
         <div class = "container">
+            <form action = "/recipe/add" method="post">
 
-            <select name="supply">
-                <% for(var i =0; i < supply.length; i++) { %>
+            <input type="text" name="menuName" value = "<%= menuName %> "/>
+            <input type="hidden" name="menuNumber" value = "<%= menuNumber %> "/>
+            <input type="text" name="ingredientName" placeholder="재료 이름 입력"/>
+            <input type="text" name="ingredientSize" placeholder="필요한 양"/>
 
-                <option value= "콜롬비아만세" selected><%= supply[i].SupplyName %></option>
-
-                <% } %>
-            </select>
-            
-
-            <input type = "text" name = "ingredientName" placeholder="재료를 입력해주세요"/>
-            <input type = "text" name = "count" placeholder="수량을 입력해주세요"/>
-
-            <button type = "submit" >주문하기</button>
-
+            <button type="submit">제출</button>
+            </form>
         </div>
 </div>
 

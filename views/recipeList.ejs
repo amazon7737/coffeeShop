@@ -1,0 +1,34 @@
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  .wrap {
+    width: 100svw;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .container {
+    width: 100svw;
+    min-height: 50svh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<div class="wrap">
+  <div class="container">
+    <% for(var i=0; i< coffee.length; i++) { %>
+    <input type="hidden" name="menuNumber" value="<%=coffee[i].menuNumber %>" />
+
+    <a href="/recipeDetail/<%= coffee[i].menuNumber %>">
+      <% include ./card.ejs %>
+    </a>
+
+    <% } %>
+  </div>
+</div>

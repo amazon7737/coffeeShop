@@ -86,45 +86,17 @@
 
 </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
 </head>
 
 <body>
-    <% include ./navbar.ejs %>
 
 <div class="wrap">
 
 
         <div class = "container">
 
-        <!-- <p><%= coffee[0].menuNumber %>번 </p> -->
         <p>메뉴명 : <%= coffee[0].menuName %></p>
         <p>가격 :₩ <%= coffee[0].menuPrice %></p>
-
-
-
-            <form action = "/addItem/<%= menuNumber %>" method="post">
-
-                <input type = "number" name = "count" value = "1"/>
-                <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
-                <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
-                <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
-                <input type="hidden" name = "directOrder" value = "0" />
-
-                <button type = "submit" >담기</button>
-            </form>
-
-
-            <form action = "/purchase" method="post">
-                <input type = "number" name = "count" value = "1"/>
-                <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
-                <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
-                <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
-
-
-                <button type = "submit">바로구매하기</button>
-                </form>
-
 
                 <p class = "ingredient">영양성분</p>
                 <table>
@@ -134,22 +106,48 @@
                     <tr>
                         <th>재료이름</th>
                         <th>재료양</th>
+                        <th>
+                            <form action = "/recipe/addPage" method="post">
+                        <input type = "hidden" name = "menuNumber" value = "<%= coffee[0].menuNumber %>" />
+                                <button type="submit">재료 추가</button>
+                            </form>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
+                    <form action = "/recipe/update" method="post">
 
-                <div class="ingredient-container">
-                <% for(var i = 0; i< ingredient.length; i++) { %>
+
+                        <% for(var i = 0; i < ingredient.length; i++) { %>
+                        <input type = "hidden" name = "menuNumber" value = "<%= coffee[0].menuNumber %>" />
+                        <input type = "hidden" name = "ingredientNumber" value = "<%= ingredient[i].ingredientNumber %>" />
                     <tr>
+                        <th>
 
-                    <th><%= ingredient[i].ingredientName %></th>
-                    <th><%= ingredient[i].ingredientSize %></th>
+                        <input type = "text" name = "name" value = "<%= ingredient[i].ingredientName %> " />
+                        </th>
+
+                        <th>
+                        <input type = "text" name = "size" value = "<%= ingredient[i].ingredientSize %>"/>
+                        </th>
+
+                        <th>
+                            <button type = "submit">수정</button>
+                    </form>
+                        </th>
+
+                        <th>
+                                <form action = "/recipe/del/<%= ingredient[i].ingredientNumber %>" method="post">
+                                    <input type = "hidden" name = "ingredientNumber" value = "<%= ingredient[i].ingredientNumber %>" />
+                                    <input type = "hidden" name = "menuNumber" value = "<%= coffee[0].menuNumber %>" />
+                                    <button type = "submit">재료 삭제</button>
+                                </form>
+                        </th>
                     </tr>
-                    <% } %>
-                </div>
+
+                        <% } %>
                 </tbody>
-                </table>
-    </div>
+
 </div>
 
 </div>
