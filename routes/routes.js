@@ -12,20 +12,8 @@ const pool = require("../db/db");
 // 해야할것
 /**
  *
- * 관리자 -> 회원아이디 admin으로 변경후 admin만 인식해서 관리자로 변경
- *
- * 메뉴 - 재료 추가기능
- *
- */
-
-/**
- * 길
- *
- *
- * /basket 장바구니
- *
- * /order 주문내역 조회
- * /supply 재고량 조회 및 재료 구매 기능
+ * 레시피 새로짜기
+ * 업체별 재료 새로짜기
  *
  */
 
@@ -86,11 +74,41 @@ router.get("/manage", async (req, res, next) => {
 // 커피 리스트/메뉴 담으러가기
 router.get("/orderList", async (req, res, next) => {
   const coffee = await pool.query("select * from coffee.menu;");
-  // console.log("!!!", coffee[0]);
+  console.log("!!!", coffee[0]);
+
+  // 추천메뉴 대표메뉴
+  temp = [];
+
+  for (var i = 0; i < coffee[0].length; i++) {
+    if (coffee[0][i].starMenu == "1") {
+      temp.push({
+        menuNumber: coffee[0][i].menuNumber,
+        starMenu: "추천메뉴",
+      });
+    } else if (coffee[0][i].starMenu == "2") {
+      temp.push({
+        menuNumber: coffee[0][i].menuNumber,
+        starMenu: "대표메뉴",
+      });
+    } else {
+      temp.push({
+        menuNumber: coffee[0][i].menuNumber,
+        starMenu: "",
+      });
+    }
+  }
+  console.log(temp);
+  /**
+   *
+   */
+
   res.render("menuList", {
     coffee: coffee[0],
+    starMenu: temp,
   });
 });
+
+// 추천메뉴 변경 (A)
 
 // 커피/메뉴 상세페이지
 router.get("/menuDetail/:menuNumber", async (req, res) => {
@@ -223,13 +241,13 @@ router.post("/order", async (req, res, next) => {
 
   try {
     // 총액 계산 중
-    for (var j = 0; j < check.length; j++) {
+    // for (var j = 0; j < check.length; j++) {
       for (var i = 0; i < basket.length; i++) {
         if (check[j] == basket[i].menuNumber) {
           resultMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
         }
       }
-    }
+    // }
     console.log("resultMoney", resultMoney);
   } catch (error) {
     console.log(error);
@@ -251,14 +269,14 @@ router.post("/ordering", async (req, res, next) => {
   const { orderType, orderDate, customerId, check } = req.body;
   try {
     let basket = req.session.basket;
-    console.log("basket:", basket);
+    // console.log("basket:", basket);
 
     // order 테이블에 주문번호 자동생성 (orderType, orderDate, customerId, orderId)
     const users = await pool.query(
       "select * from coffee.customer where customerId = ?",
       [Number(customerId)]
     );
-    console.log("users:", users[0][0]);
+    // console.log("users:", users[0][0]);
     if (users[0][0] == undefined) {
       return res.send(
         `<script type = "text/javascript">alert("주문 중 문제가 발생했습니다. 주문서를 다시 확인해주세요."); window.history.back();</script>`
@@ -266,10 +284,10 @@ router.post("/ordering", async (req, res, next) => {
     }
 
     // 주문하는 사람의 주문번호 생성
-    const orderAdd = await pool.query(
-      "insert into coffee.order values(?,?,null, ?,?) ",
-      [orderType, orderDate, Number(customerId), users[0][0].customerName]
-    );
+    // const orderAdd = await pool.query(
+    //   "insert into coffee.order values(?,?,null, ?,?) ",
+    //   [orderType, orderDate, Number(customerId), users[0][0].customerName]
+    // );
 
     // order-menu (menuNumber, orderId, menuCount)
     // 주문 번호를 기준으로 select하지 않아서 중복되는 정보이라면 엉뚱한 주문번호를 select 하게된다 -> 해결: 주문번호를 기준으로 최근주문번호부터 맨처음에 뜨게 하게
@@ -288,14 +306,64 @@ router.post("/ordering", async (req, res, next) => {
         console.log("check!:", check);
         if (check[j] == basket[i].menuNumber) {
           // 주문한 메뉴 주문하기
-          const orderMenuAdd = await pool.query(
-            "insert into coffee.order_menu values(null, ?,?,?);",
-            [
-              Number(basket[i].menuNumber),
-              Number(orderSel[0][0].orderId),
-              basket[i].count,
-            ]
+          // const orderMenuAdd = await pool.query(
+          //   "insert into coffee.order_menu values(null, ?,?,?);",
+          //   [
+          //     Number(basket[i].menuNumber),
+          //     Number(orderSel[0][0].orderId),
+          //     basket[i].count,
+          //   ]
+          // );
+
+          // 재고 수량 =  재고수량 - 주문수량 * 사용량
+          const supplySel = await pool.query(
+            "SELECT a.*, b.* FROM coffee.Supply_has_ingredient a inner join coffee.ingredient b on a.ingredient_ingredientNumber = b.ingredientNumber;"
           );
+          console.log("supplySel:", supplySel[0]);
+          const menuSel = await pool.query(
+            "SELECT * FROM coffee.menu_has_ingredient where menu_menuNumber = ?;",
+            [basket[i].menuNumber]
+          );
+          console.log("menuSel:", menuSel[0]);
+          const sel = await pool.query(
+            "SELECT a.* , b.* FROM coffee.menu_has_ingredient a inner join coffee.ingredient b on a.ingredient_ingredientNumber = b.ingredientNumber;"
+          );
+
+          for (var i = 0; i < basket.length; i++) {
+            for (var j = 0; j < supplySel[0].length; j++) {
+              // 사용량
+              const use = await pool.query(
+                "select * from coffee.menu_has_ingredient where menu_menuNumber = ? inner join coffee.ingredient b on a.ingredient_ingredientNumber = b.ingredientNumber;",
+                [Number(basket[i].menuNumber)]
+              );
+
+              console.log("use!!:", use[0]);
+
+              let useCount =
+              Number(use[0][j].count) = Number(basket[i].count) * Number(use[0][i].ingredientSize);
+
+              console.log(
+                "useCount:",
+                useCount,
+                menuSel[0][j].ingredient_ingredientNumber
+              );
+              try {
+                const updateIngredient = await pool.query(
+                  "update Supply_has_ingredient set ingredientCount = ? where ingredient_ingredientNumber =?",
+                  [
+                    Number(useCount),
+                    Number(menuSel[0][j].ingredient_ingredientNumber),
+                  ]
+                );
+                console.log(updateIngredient[0]);
+              } catch (error) {
+                console.log(error);
+              }
+            }
+
+            console.log("성공");
+            //const ingredientUse = await pool.query("update menu ")
+          }
         }
       }
     }
@@ -316,40 +384,40 @@ router.post("/ordering", async (req, res, next) => {
 });
 
 // 바로구매 페이지
-router.post("/purchase", async (req, res) => {
-  const { count, menuName, menuNumber, menuPrice } = req.body;
-  console.log("purchase:", menuName, menuNumber, menuPrice, count);
-  try {
-    let basket = [
-      {
-        menuNumber: menuNumber,
-        menuName: menuName,
-        count: count,
-        menuPrice: menuPrice,
-      },
-    ];
+// router.post("/purchase", async (req, res) => {
+//   const { count, menuName, menuNumber, menuPrice } = req.body;
+//   console.log("purchase:", menuName, menuNumber, menuPrice, count);
+//   try {
+//     let basket = [
+//       {
+//         menuNumber: menuNumber,
+//         menuName: menuName,
+//         count: count,
+//         menuPrice: menuPrice,
+//       },
+//     ];
 
-    req.session.basket = basket;
-    // 날짜 생성
-    let today = new Date();
-    let year = today.getFullYear();
-    let month = today.getMonth();
-    let date = today.getDate();
-    const totalMoney = Number(basket[0].count) * Number(basket[0].menuPrice);
+//     req.session.basket = basket;
+//     // 날짜 생성
+//     let today = new Date();
+//     let year = today.getFullYear();
+//     let month = today.getMonth();
+//     let date = today.getDate();
+//     const totalMoney = Number(basket[0].count) * Number(basket[0].menuPrice);
 
-    // console.log("???", basket[0].count, basket[0].menuPrice);
+//     // console.log("???", basket[0].count, basket[0].menuPrice);
 
-    const wdate = year + "-" + month + "-" + date;
+//     const wdate = year + "-" + month + "-" + date;
 
-    return res.render("order", {
-      basket: basket,
-      orderDate: wdate,
-      totalMoney: totalMoney,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
+//     return res.render("order", {
+//       basket: basket,
+//       orderDate: wdate,
+//       totalMoney: totalMoney,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 // 주문 내역 조회
 router.get("/orderList", async (req, res, next) => {
@@ -403,7 +471,6 @@ router.get("/supplySearch", async (req, res, next) => {
 });
 
 // 재료 업체별 재고량 조회 기능
-// 관리자 판별 코드에서 할지 디비에서 할지 고민하기
 router.post("/supplySearch", async (req, res) => {
   const { customerId } = req.body;
   console.log("customerId1:", customerId);
@@ -538,7 +605,7 @@ router.get("/recipeDetail/:menuNumber", async (req, res, next) => {
   }
 });
 
-// 레시피 추가 페이지
+// 레시피 조회 페이지
 router.post("/recipe/addPage", async (req, res, next) => {
   const { menuNumber } = req.body;
   const menu = await pool.query(
