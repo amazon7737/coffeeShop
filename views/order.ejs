@@ -40,28 +40,24 @@
 <thead>
 
         <tr>
-            <th scope="col" class = "thead">메뉴이름</th>
-            <th scope="col" class = "thead">가격</th>
+            <!-- <th scope="col" class = "thead">메뉴이름</th> -->
+            <!-- <th scope="col" class = "thead">가격</th> -->
         </tr>
 
 </thead>
 <tbody>
 
-        <% for(var j =0; j< check.length; j++ ){ %>
         <% for(var i =0; i< basket.length; i++ ){ %>
-            <% if(check[j] == basket[i].menuNumber ) { %>
             <tr>
-                <th>
+                <!-- <th>
                     <%= basket[i].menuName %>
-                </th>
-                <th>
+                </th> -->
+                <!-- <th>
                     <%= basket[i].menuPrice %>
-                </th>
+                </th> -->
             </tr>
         <% } %>
-            <% } %>
 
-            <% } %>
 
 </tbody>
         </table>
@@ -78,7 +74,7 @@
         <input type = "hidden" name = "basket" value = "<%= basket %>"/>
         <input type = "hidden" name = "check" value = "<%= check %>"/>
     
-        <h4>주문 총액 : <%= resultMoney %></h4>
+        <!-- <h4>주문 총액 : <%= resultMoney %></h4> -->
         <button type = "submit">주문하기</button>
 
         </form>

@@ -2,47 +2,22 @@
 <html>
   <head>
     <style>
-      * {
-        padding: 0;
-        margin: 0;
-      }
-      html {
+      .wrap {
         width: 100svw;
         min-height: 100svh;
-      }
-      div {
-        padding-bottom: 10px;
-      }
-
-      /* .wrap {
-        width: 100vw;
-        height: 500px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
         align-items: center;
-      } */
-
-      .wrapcard {
-        display: flex;
-        flex-direction: row;
         justify-content: center;
-        flex-wrap: wrap;
-        background-color: #f8f9fa;
       }
-
       .container {
         width: 100svw;
-        height: 25svh;
+        min-height: 25svh;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
       }
 
-      .orderManage {
+      a {
         padding-bottom: 10px;
-        border-radius: 1px;
       }
     </style>
   </head>
@@ -50,17 +25,21 @@
     <% include ./navbar.ejs %>
     <div class="wrap">
       <div class="container">
-        <div class="orderManage"><a href="/orderSearch">주문관리</a></div>
+        <a href="/orderSearch">회원주문조회</a>
 
-        <div class="ingredientManage"><a href="/supplySearch">재고관리</a></div>
-
-        <div class="manageLink"><a href="/manage">관리자페이지</a></div>
+        <a href="/supplySearch">재고량조회</a>
 
         <a href="/orderList">커피 쇼핑하기</a>
+
+        <a href="/menuAdd">커피 메뉴 추가</a>
 
         <a href="/recipe">레시피 추가</a>
 
         <a href="/IngredientAdd">업체별 재료 및 재고량 추가</a>
+
+        <form action="/starmenu" method="post">
+          <button type="submit">추천메뉴 변경</button>
+        </form>
       </div>
     </div>
   </body>

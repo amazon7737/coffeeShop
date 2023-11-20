@@ -43,14 +43,13 @@
 </head>
 
 <body>
-    <% include ./navbar.ejs %>
 
 <div class="wrap">
 <div class="container">
 <table>
 <thead>
 <tr>
-    <!-- <th scope="col" calss = "thead"></th> -->
+    <!-- <th scope="col" calss = "thead">선택</th> -->
     <th scope="col" class = "thead">
         메뉴이름
     </th>
@@ -63,7 +62,7 @@
         <form action="/order" method="post">
         <% for(var i =0 ; i< basket.length ; i++) { %>
         <tr>
-        <th><input type = "checkbox" name = "check"  value = "<%= basket[i].menuNumber %>"/> </th>
+        <!-- <th><input type = "checkbox" name = "check"  value = "<%= basket[i].menuNumber %>"/> </th> -->
         <th><%= basket[i].menuName %></th>
         <th><%= basket[i].count %></th>
         <th><%= Number(basket[i].count)*Number(basket[i].menuPrice) %></th>

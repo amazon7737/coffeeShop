@@ -52,45 +52,16 @@
     }
 
 
-    /* .box{
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20%;
-        width: 70%;
-        height: 1000px;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
-        text-align: center;
 
-    } */
-
-    /* p{
-        padding-bottom: 10px;
-    }
-
-    .State{
-        margin-top: 30px;
-    }
-
-    .button2{
-        margin-top:20px;
-    }
-
-    .image{
-        padding-left: 10%;
-    } */
 
     /* -------- */
 
 
 </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
 </head>
 
 <body>
-    <% include ./navbar.ejs %>
 
 <div class="wrap">
 
@@ -105,7 +76,7 @@
 
             <form action = "/addItem/<%= menuNumber %>" method="post">
 
-                <input type = "number" name = "count" value = "1"/>
+                <input type = "number" name = "count" value = "1" min="1", max="100"/>
                 <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
                 <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
                 <input type="hidden" class="menuPrice" name = "menuPrice" value = <%= coffee[0].menuPrice %> />
@@ -115,7 +86,8 @@
             </form>
 
 
-            <form action = "/purchase" method="post">
+            <!-- 바로구매하기 태그 -->
+            <!-- <form action = "/purchase" method="post">
                 <input type = "number" name = "count" value = "1"/>
                 <input type="hidden" class="menuName"  name = "menuName" value = <%= coffee[0].menuName %> />
                 <input type="hidden" class="menuNumber"  name = "menuNumber" value = <%= menuNumber %> />
@@ -123,8 +95,8 @@
 
 
                 <button type = "submit">바로구매하기</button>
-                </form>
-
+            </form>
+ -->
 
                 <p class = "ingredient">영양성분</p>
                 <table>

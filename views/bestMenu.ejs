@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+<style>
+    /* css */
+
+    * {
+
+        padding:0;
+
+        margin:0;
+
+    }
+
+    .wrap{
+        width: 100svw;
+        min-height: 50svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container{
+        width: 100svw;
+        height: 25svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+
+</style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+
+        <div class = "container">
+<table>
+    <tr>
+        <th>
+        순위
+        </th>
+        <th>
+        메뉴이름
+        </th>
+        <th>
+        판매량
+        </th>
+    </tr>
+        <% for(var i =0; i < 2 ; i++){ %>
+    <tr>
+
+        <th>
+            <%= i+1 %>
+
+        </th>
+        <th>
+            <%= temp[i].menuName %>
+        </th>
+        <th>
+            <%= temp[i].count %>
+        </th>
+    </tr>
+    <% } %>
+</table>
+
+        </div>
+</div>
+
+
+
+</body>
+
+</html>
