@@ -21,7 +21,7 @@ app.use(
     secret: "45678()(*&*&",
     resave: false,
     saveUninitialized: true,
-    cookie: { basket: [] },
+    cookie: { basket: [], disMoney: 0 },
   })
 );
 /**

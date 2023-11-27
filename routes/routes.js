@@ -54,7 +54,7 @@ router.post("/coffee/search", async (req, res, next) => {
         `<script type = "text/javascript">alert("해당 카테고리가 없습니다."); location.href= "/";</script>`
       );
     }
-    return res.render("menuList", { coffee: coffeeSearch[0] });
+    return res.render("menuList", { coffee: coffeeSearch[0], starMenu: "1" });
   } catch (error) {
     return res.send(
       `<script type = "text/javascript">alert("해당 카테고리가 없습니다."); location.href= "/";</script>`
@@ -226,11 +226,7 @@ router.get("/menuDetail/:menuNumber", async (req, res) => {
 // 장바구니 페이지
 router.get("/basket", async (req, res, next) => {
   const basket = req.session.basket;
-  // let totalMoney = 0;
   try {
-    // for (var i = 0; i < basket.length; i++) {
-    //   totalMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
-    // }
     if (basket == undefined) {
       return res.send(
         `<script type = "text/javascript">alert("장바구니에 물품이 없습니다."); window.history.back();</script>`
@@ -297,40 +293,38 @@ router.post("/order", async (req, res, next) => {
 
   // 총액 새로 계산
   let resultMoney = 0;
-
-  // if (check == undefined) {
-  //   return res.send(
-  //     `<script type = "text/javascript" >alert("주문할 상품을 선택해주세요."); window.history.back();</script>`
-  //   );
-  // }
+  let disMoney = 0;
+  const total = await pool.query("select * from coffee.customer;");
 
   // 총액 계산
   try {
-    // for (var j = 0; j < check.length; j++) {
     for (var i = 0; i < basket.length; i++) {
-      // if (check[i] == basket[i].menuNumber) {
-      //   resultMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
-      // }
+      resultMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
     }
-    // }
   } catch (error) {
     console.log(error);
-    // return res.send(
-    //   `<script type = "text/javascript" >alert("주문할 상품을 선택해주세요."); window.history.back();</script>`
-    // );
   }
-
+  if (total[0][0].grade == "골드") {
+    disMoney = resultMoney * 0.2;
+  } else if (total[0][0].grade == "실버") {
+    disMoney = resultMoney * 0.1;
+  } else if (total[0][0].grade == "브론즈") {
+    disMoney = resultMoney * 0.05;
+  }
+  req.session.disMoney = disMoney;
   res.render("order", {
     orderDate: wdate,
     resultMoney: resultMoney,
     basket: basket,
     check: check,
+    disMoney: disMoney,
   });
 });
 
 // 주문하기 기능
 router.post("/ordering", async (req, res, next) => {
   const { orderType, orderDate, customerId, check } = req.body;
+  let disMoney = req.session.disMoney;
   try {
     let basket = req.session.basket;
     console.log(basket);
@@ -360,10 +354,21 @@ router.post("/ordering", async (req, res, next) => {
         `<script type = "text/javascript">alert("주문 중 문제가 발생했습니다. 주문서를 다시 확인해주세요."); window.history.back();</script>`
       );
     }
+    let resultMoney = 0;
+    for (var i = 0; i < basket.length; i++) {
+      resultMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
+    }
 
     const orderAdd = await pool.query(
-      "insert into coffee.order values(?,?,null,?,?)",
-      [orderType, orderDate, Number(customerId), users[0][0].customerName]
+      "insert into coffee.order values(?,?,null,?,?,?,?)",
+      [
+        orderType,
+        orderDate,
+        Number(customerId),
+        users[0][0].customerName,
+        Number(resultMoney),
+        Number(disMoney),
+      ]
     );
 
     const orderSel = await pool.query(
@@ -385,8 +390,53 @@ router.post("/ordering", async (req, res, next) => {
           Number(basket[i].count),
         ]
       );
+      let totalMoney = 0;
+      for (var i = 0; i < basket.length; i++) {
+        totalMoney += Number(basket[i].menuPrice) * Number(basket[i].count);
+      }
+
+      //누적액 추가
+      const totalSel = await pool.query("select * from coffee.customer");
+
+      const orderMenu = await pool.query(
+        "update coffee.customer set total = ? where customerId = 1234",
+        [totalMoney + Number(totalSel[0][0].total)]
+      );
+
       // 주문 후 장바구니 비우기
       req.session.basket = undefined;
+
+      /**
+       *
+       *
+       */
+
+      const total = await pool.query("select * from coffee.customer;");
+      console.log(total[0]);
+
+      // for (var i = 0; i < total[0].length; i++) {
+      if (total[0][0].total >= 50000) {
+        const update = await pool.query(
+          "update coffee.customer set grade = ?",
+          ["골드"]
+        );
+      } else if (total[0][0].total >= 30000) {
+        const update = await pool.query(
+          "update coffee.customer set grade = ?",
+          ["실버"]
+        );
+      } else {
+        const update = await pool.query(
+          "update coffee.customer set grade = ?",
+          ["브론즈"]
+        );
+      }
+      // }
+      /**
+       *
+       *
+       */
+
       // 주문 완료 신호
       return res.send(
         `<script type = "text/javascript">alert("주문이 완료되었습니다."); location.href="/"</script>`
@@ -716,6 +766,7 @@ router.get("/table", async (req, res) => {
   res.render("table", { data: data2[0] });
 });
 
+// 2주차 s.. ( 검사는 안맡음)
 router.post("/table", async (req, res) => {
   const data = [
     {
@@ -738,7 +789,7 @@ router.post("/table", async (req, res) => {
     );
   }
 
-  console.log(temp);
+  // console.log(temp);
 
   // console.log(order[0]);
   // for (var i = 0; i < order[0].length; i++) {
@@ -749,5 +800,12 @@ router.post("/table", async (req, res) => {
   // }
   res.render("table", {});
 });
+
+// 구매 총액 누적 B
+router.get("/total", async (req, res) => {});
+
+// 등급 올라가는거 A
+
+// 등급에 따라서 할인금액 S
 
 module.exports = router;
